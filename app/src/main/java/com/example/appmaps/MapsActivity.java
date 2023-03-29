@@ -14,8 +14,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.appmaps.databinding.ActivityMapsBinding;
+import com.google.android.gms.maps.model.PointOfInterest;
+
+import java.util.Locale;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -54,6 +58,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(home).title("Marker in Home"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, 18));
+
+        setMapLongClick(mMap);
+        setPoiClick(mMap);
     }
 
     @Override
@@ -78,7 +85,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.satelite_map:
                 mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                 return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return true;
+    }
+
+    private void setMapLongClick(final GoogleMap mMap) {
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(@NonNull LatLng latLng) {
+                String text = String.format(Locale.getDefault(),
+                        "Lat : %1$.5f, Long : %2$.5f",
+                        latLng.latitude,
+                        latLng.longitude);
+                mMap.addMarker(new MarkerOptions().position(latLng)
+                        .title("Dropped pin")
+                        .snippet(text));
+            }
+        });
+    }
+
+    private void setPoiClick(final GoogleMap map){
+        map.setOnPoiClickListener(new GoogleMap.OnPoiClickListener() {
+            @Override
+            public void onPoiClick(@NonNull PointOfInterest pointOfInterest) {
+                Marker poiMarker = mMap.addMarker(new MarkerOptions()
+                        .position(pointOfInterest.latLng)
+                        .title(pointOfInterest.name));
+                poiMarker.showInfoWindow();
+            }
+        });
     }
 }
