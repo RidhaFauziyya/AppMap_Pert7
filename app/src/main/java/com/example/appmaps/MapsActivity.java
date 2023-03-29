@@ -2,8 +2,12 @@ package com.example.appmaps;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,15 +56,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
+        // Membuat marker default
         LatLng vokasiUgm = new LatLng(-7.774786, 110.374559);
         LatLng home = new LatLng(-7.755305, 113.215781);
+
+        //Memberikan title pada marker
         mMap.addMarker(new MarkerOptions().position(home).title("Marker in Home"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, 18));
 
         setMapLongClick(mMap);
         setPoiClick(mMap);
+        enableMyLocation();
     }
 
     @Override
@@ -115,5 +122,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 poiMarker.showInfoWindow();
             }
         });
+    }
+
+    //Mengecek permisi
+    private void enableMyLocation(){
+        //Kalau uda set locasi di map
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
+            mMap.setMyLocationEnabled(true);
+        }
+        //Kalau belum request permission
+        else{
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    1);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        //Menyesuasikan request code di fungsi enableMyLocation
+        switch (requestCode){
+            case 1:
+                if (grantResults.length > 0 && grantResults[0]
+                    == PackageManager.PERMISSION_GRANTED){
+                    enableMyLocation();
+                    break;
+                }
+        }
     }
 }
