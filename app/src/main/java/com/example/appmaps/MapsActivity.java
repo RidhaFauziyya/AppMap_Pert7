@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +18,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.appmaps.databinding.ActivityMapsBinding;
@@ -58,13 +62,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Membuat marker default
         LatLng vokasiUgm = new LatLng(-7.774786, 110.374559);
-        LatLng home = new LatLng(-7.755305, 113.215781);
+        LatLng kos = new LatLng(-7.777276, 110.360068);
+        LatLng tugu = new LatLng(-7.782964, 110.367136);
 
         //Memberikan title pada marker
-        mMap.addMarker(new MarkerOptions().position(home).title("Marker in Home"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(home));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(home, 18));
+        mMap.addMarker(new MarkerOptions().position(vokasiUgm).title("Marker in Vocational School UGM"));
+        mMap.addMarker(new MarkerOptions().position(kos).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)).title("Marker in Kos Putri Orange"));
+        mMap.addMarker(new MarkerOptions().position(tugu).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)).title("Marker in Vocational School UGM"));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(vokasiUgm));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(vokasiUgm, 13));
 
+        //Memanggil fungsi yang sudah dibuat
+        setMapStyle();
         setMapLongClick(mMap);
         setPoiClick(mMap);
         enableMyLocation();
@@ -151,6 +160,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     enableMyLocation();
                     break;
                 }
+        }
+    }
+
+    public void setMapStyle(){
+        boolean result = mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(this, R.raw.maps_style));
+        if (result){
+            Log.e("Map", "Error set style map");
         }
     }
 }
